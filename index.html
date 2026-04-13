@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>天工百物 · 三元配对</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>天工百物 · 三元配对</h1>
+            <div class="game-info">
+                <div class="info-item">
+                    <div class="label">分数</div>
+                    <div id="score" class="value">0</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">最高分</div>
+                    <div id="highScore" class="value">0</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">连击</div>
+                    <div id="combo" class="value">0</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">关卡</div>
+                    <div id="level" class="value">1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 移除社交媒体互动按钮 -->
+
+        <div class="game-main">
+            <div class="game-area">
+                <canvas id="tetris" width="300" height="500"></canvas>
+            </div>
+
+            <div class="game-sidebar">
+                <div class="next-block">
+                    <div class="label">下一个</div>
+                    <canvas id="nextPiece" width="120" height="120"></canvas>
+                </div>
+
+                <div class="game-controls">
+                    <div class="primary-controls">
+                        <button id="startBtn" class="btn start-btn">开始</button>
+                        <button id="pauseBtn" class="btn pause-btn" disabled>暂停</button>
+                    </div>
+                    <div class="secondary-controls">
+                        <button id="levelSelectBtn" class="btn level-select-btn">关卡选择</button>
+                        <button id="resetBtn" class="btn reset-btn">重新开始</button>
+                    </div>
+                </div>
+
+                <!-- 游戏控制按钮组 -->
+                <div class="game-pad">
+                    <div class="pad-row" style="display:flex; justify-content:center; gap:10px;">
+                        <button id="leftBtn" class="pad-btn left-btn">←</button>
+                        <button id="downBtn" class="pad-btn down-btn">↓</button>
+                        <button id="rightBtn" class="pad-btn right-btn">→</button>
+                    </div>
+                    <div class="pad-row" style="margin-top:10px;">
+                        <button id="dropBtn" class="pad-btn drop-btn">直接落下</button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div id="gameOverModal" class="modal">
+            <div class="modal-content">
+                <h2>游戏结束</h2>
+                <p>最终分数: <span id="finalScore">0</span></p>
+                <button id="playAgainBtn" class="btn play-again-btn">再玩一次</button>
+            </div>
+        </div>
+
+        <!-- 关卡通关模态框 -->
+        <div id="level1WinModal" class="modal">
+            <div class="modal-content">
+                <h2>恭喜你！</h2>
+                <p id="levelCompleteMessage">通过关卡考验</p>
+                <div class="modal-buttons">
+                    <button id="restartLevelBtn" class="btn restart-btn">重新来</button>
+                    <button id="nextLevelBtn" class="btn next-btn">下一关</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通关模态框 -->
+        <div id="winModal" class="modal">
+            <div class="modal-content">
+                <h2>恭喜通关！</h2>
+                <p>你的得分: <span id="winScore">0</span></p>
+                <button onclick="game.reset()">重新开始</button>
+            </div>
+        </div>
+
+        <!-- 关卡选择模态框 -->
+        <div id="levelSelectModal" class="modal">
+            <div class="modal-content">
+                <h2>选择关卡</h2>
+                <div class="level-select-container"
+                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0;">
+                    <button class="level-btn" onclick="game.selectLevel(1)">第1关：耒（lěi）</button>
+                    <button class="level-btn" onclick="game.selectLevel(2)">第2关：耜（sì）</button>
+                    <button class="level-btn" onclick="game.selectLevel(3)">第3关：犁（lí）</button>
+                    <button class="level-btn" onclick="game.selectLevel(4)">第4关：耕牛（gēng niú）</button>
+                    <button class="level-btn" onclick="game.selectLevel(5)">第5关：耖（chào）</button>
+                    <button class="level-btn" onclick="game.selectLevel(6)">第6关：磨耙（mó bà）</button>
+                    <button class="level-btn" onclick="game.selectLevel(7)">第7关：秧弹（yāng dàn）</button>
+                    <button class="level-btn" onclick="game.selectLevel(8)">第8关：耧车（lóu chē）</button>
+                    <button class="level-btn" onclick="game.selectLevel(9)">第9关：稻麦藁包（dào mài gǎo bāo）</button>
+                    <button class="level-btn" onclick="game.selectLevel(10)">第10关：秧马（yāng mǎ）</button>
+                </div>
+                <button class="btn" onclick="document.getElementById('levelSelectModal').classList.remove('show')"
+                    style="background-color: #E0E0E0; color: #333;">取消</button>
+            </div>
+        </div>
+        <style>
+            .level-btn {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                transition: all 0.3s ease;
+            }
+
+            .level-btn:hover {
+                background-color: #45a049;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+            
+            /* 锁定状态 */
+            .level-btn.locked {
+                opacity: 0.5;
+                cursor: not-allowed;
+                background-color: #666 !important;
+            }
+            
+            /* 已完成状态 */
+            .level-btn.completed {
+                background-color: #2E7D32 !important;
+                position: relative;
+            }
+            
+            .level-btn.completed::after {
+                content: '✓';
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background-color: white;
+                color: #2E7D32;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+            }
+        </style>
+
+        <!-- 自定义确认弹窗 -->
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <h2>确认操作</h2>
+                <p>确定要重新开始游戏吗？当前进度将会全部重置哦！</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="confirmBtn" class="btn start-btn">确定</button>
+                    <button id="cancelBtn" class="btn reset-btn">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

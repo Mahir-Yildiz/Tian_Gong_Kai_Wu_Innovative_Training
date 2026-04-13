@@ -1,0 +1,849 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 根字体大小设置，用于响应式单位 */
+html {
+    font-size: 16px;
+    /* 在小屏幕上减小根字体大小 */
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
+    @media (max-width: 480px) {
+        font-size: 12px;
+    }
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #81c784 0%, #4caf50 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    position: relative;
+    overflow-x: hidden;
+    /* 防止触摸滚动 */
+    touch-action: manipulation;
+    user-select: none;
+}
+
+body::before,
+body::after {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: -1;
+}
+
+body::before {
+    top: 10%;
+    left: 10%;
+}
+
+body::after {
+    bottom: 10%;
+    right: 10%;
+}
+
+.game-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: 1rem;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    max-width: 100%;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+    border: 2px solid #4caf50;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    /* 根据视口宽度调整最大宽度 */
+    max-width: min(95vw, 620px);
+    /* 确保容器不会超出屏幕高度 */
+    max-height: 95vh;
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.game-header h1 {
+    font-size: 1.6rem;
+    color: #333;
+    margin-bottom: 0.8rem;
+    background: linear-gradient(45deg, #4caf50, #388e3c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
+    padding: 0.3rem 0;
+    line-height: 1.2;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(76, 175, 80, 0.1);
+    padding: 0.6rem;
+    border-radius: 10px;
+    margin-bottom: 0.8rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.info-item {
+    text-align: center;
+}
+
+.info-item .label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.3rem;
+}
+
+.info-item .value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.game-main {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+    align-items: flex-start;
+    padding: 0.5rem;
+    justify-content: center;
+    flex-wrap: nowrap;
+    /* 确保主游戏区域和侧边栏在容器内合理分布 */
+    align-content: flex-start;
+}
+
+.game-area {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 使用相对单位确保游戏区域自适应 */
+    width: min(60vw, 300px);
+    max-width: 100%;
+}
+
+#tetris {
+    border: 2px solid #4caf50;
+    border-radius: 10px;
+    background: #1a1a1a;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+    /* 使用相对单位，保持游戏区域的宽高比 */
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3/5; /* 300:500 简化为 3:5 */
+    max-height: 65vh;
+}
+
+.game-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 220px;
+    padding: 1rem;
+    background: rgba(76, 175, 80, 0.05);
+    border-radius: 12px;
+    flex-shrink: 0;
+    /* 确保侧边栏不会超出屏幕宽度 */
+    max-width: 50vw;
+}
+
+.next-block {
+    background: rgba(76, 175, 80, 0.1);
+    padding: 0.6rem;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.next-block .label {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 0.8rem;
+    font-weight: bold;
+}
+
+#nextPiece {
+    border: 2px solid #c8e6c9;
+    border-radius: 8px;
+    background: #f9f9f9;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1/1;
+    max-width: 120px;
+    max-height: 120px;
+}
+
+/* 移除社交媒体互动按钮样式 */
+
+/* 模态框按钮组样式 */
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* 重新来按钮样式 */
+.btn.restart-btn {
+    background-color: #E0E0E0; /* 浅灰色 */
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 下一关按钮样式 */
+.btn.next-btn {
+    background-color: #FF9800; /* 橙色 */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+}
+
+.btn.next-btn:hover {
+    background: linear-gradient(45deg, #45a049, #3d8b40);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+}
+
+.btn.next-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
+
+/* 飘带动画效果 */
+.ribbon {
+    position: fixed;
+    width: 100px;
+    height: 20px;
+    border-radius: 5px;
+    opacity: 0.8;
+    animation: ribbonFloat 3s ease-in-out forwards;
+    z-index: 1000;
+}
+
+@keyframes ribbonFloat {
+    0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* 游戏控制按钮 */
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    align-items: center;
+}
+
+/* 主要控制按钮（开始和暂停） */
+.primary-controls {
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.primary-controls .btn {
+    width: auto; /* 长度根据文本内容自适应 */
+    min-width: 80px; /* 设置最小宽度，确保按钮不会太小 */
+    max-width: 120px; /* 设置最大宽度，确保按钮不会太大 */
+    font-size: 0.8rem; /* 缩小字体大小 */
+    padding: 0.5rem 0.7rem; /* 调整内边距 */
+    flex: 1; /* 确保两个按钮长度一致 */
+    text-align: center; /* 文本居中 */
+}
+
+/* 次要控制按钮（关卡选择和重新开始） */
+.secondary-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    align-items: center;
+}
+
+.secondary-controls .btn {
+    width: 150px; /* 恢复原始按钮宽度 */
+    font-size: 0.9rem; /* 恢复原始字体大小 */
+    padding: 0.7rem 0.5rem; /* 恢复原始内边距 */
+    min-height: 36px; /* 恢复原始最小高度 */
+}
+
+.btn {
+    padding: 0.7rem 0.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;
+    width: 150px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    min-height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 确保按钮在小屏幕上也有足够的点击区域 */
+    touch-action: manipulation;
+    margin: 0 auto;
+}
+
+/* 关卡选择按钮样式 */
+.btn.level-select-btn {
+    background-color: #2196F3; /* 蓝色，与暂停按钮的颜色不同 */
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+}
+
+.btn.level-select-btn:hover {
+    background: linear-gradient(45deg, #1976D2, #1565C0);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(33, 150, 243, 0.4);
+}
+
+.btn.level-select-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn.start-btn {
+    background: linear-gradient(45deg, #4ade80, #22c55e);
+}
+
+.btn.start-btn:hover {
+    box-shadow: 0 5px 15px rgba(74, 222, 128, 0.4);
+}
+
+.btn.pause-btn {
+    background: linear-gradient(45deg, #facc15, #eab308);
+}
+
+.btn.pause-btn:hover {
+    box-shadow: 0 5px 15px rgba(250, 204, 21, 0.4);
+}
+
+.btn.reset-btn {
+    background: linear-gradient(45deg, #ef4444, #dc2626);
+    width: 150px;
+}
+
+.btn.reset-btn:hover {
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+}
+
+.game-pad {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(76, 175, 80, 0.05);
+    border-radius: 8px;
+    align-items: center;
+}
+
+.pad-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+}
+
+.pad-btn {
+    width: 45px;
+    height: 36px;
+    min-width: 40px;
+    min-height: 36px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: linear-gradient(45deg, #4caf50, #388e3c);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(76, 175, 80, 0.3);
+    /* 确保按钮在触摸设备上有足够的点击区域 */
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.pad-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+}
+
+.pad-btn:active {
+    transform: translateY(0);
+}
+
+.down-btn {
+    width: min(45px, 100%);
+    background: linear-gradient(45deg, #FF9800, #F57C00);
+}
+
+.down-btn:hover {
+    box-shadow: 0 6px 15px rgba(255, 152, 0, 0.4);
+}
+
+.drop-btn {
+    width: 150px;
+    background: linear-gradient(45deg, #E91E63, #AD1457);
+    min-width: auto;
+}
+
+.drop-btn:hover {
+    box-shadow: 0 6px 15px rgba(233, 30, 99, 0.4);
+}
+
+.rotate-btn {
+    background: linear-gradient(45deg, #ff9800, #f57c00);
+}
+
+.reset-btn {
+    width: 150px;
+    background: linear-gradient(45deg, #ef4444, #dc2626);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s ease;
+    border: 2px solid #4caf50;
+    /* 确保模态框在小屏幕上也能正常显示 */
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.modal p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.modal-content #finalScore {
+    color: #4caf50;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.modal .btn {
+    margin: 0 10px;
+}
+
+.play-again-btn {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 10px rgba(74, 222, 128, 0.3);
+    touch-action: manipulation;
+}
+
+.play-again-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 222, 128, 0.4);
+}
+
+.play-again-btn:active {
+    transform: translateY(0);
+}
+
+/* 平板设备适配 */
+@media (max-width: 640px) {
+    .game-container {
+        padding: 1rem;
+        max-height: 98vh;
+    }
+    
+    .game-main {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .game-area {
+        width: min(70vw, 300px);
+    }
+    
+    .game-sidebar {
+        flex-direction: column;
+        min-width: 100%;
+        gap: 1rem;
+        justify-content: center;
+        padding: 0.8rem;
+    }
+    
+    .game-controls {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .game-controls .btn {
+        flex: 1;
+        min-width: 100px;
+    }
+    
+    .next-block {
+        min-width: 120px;
+        margin: 0 auto;
+    }
+    
+    #nextPiece {
+        max-width: 120px;
+        max-height: 120px;
+    }
+    
+    .game-pad {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .pad-btn {
+        width: min(60px, 30%);
+        height: min(50px, 15vw);
+    }
+}
+
+/* 大屏手机适配 */
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+        overflow-x: hidden;
+    }
+    
+    .game-container {
+        padding: 0.8rem;
+        max-height: 98vh;
+        overflow-y: auto;
+    }
+    
+    .game-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .game-info {
+        gap: 0.3rem;
+        padding: 0.5rem;
+    }
+    
+    .info-item {
+        flex: 1;
+        min-width: 80px;
+    }
+    
+    .info-item .label {
+        font-size: 0.7rem;
+    }
+    
+    .info-item .value {
+        font-size: 1rem;
+    }
+    
+    .game-area {
+        width: min(80vw, 280px);
+    }
+    
+    #tetris {
+        max-height: 60vh;
+    }
+    
+    .game-sidebar {
+        flex-direction: column;
+        min-width: 100%;
+        gap: 0.8rem;
+        padding: 0.5rem;
+    }
+    
+    .next-block,
+    .game-controls {
+        min-width: 100px;
+        margin: 0 auto;
+    }
+    
+    .game-controls {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .game-controls .btn {
+        flex: 1;
+        min-width: 80px;
+    }
+    
+    #nextPiece {
+        max-width: 100px;
+        max-height: 100px;
+    }
+    
+    .btn {
+        padding: 0.7rem 0.4rem;
+        font-size: 0.9rem;
+        min-height: 35px;
+    }
+    
+    .game-pad {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .pad-btn {
+        width: min(60px, 30%);
+        height: min(50px, 15vw);
+        font-size: 1rem;
+    }
+    
+    .modal-content {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+}
+
+/* 小屏手机适配 */
+@media (max-width: 360px) {
+    .game-container {
+        padding: 0.5rem;
+    }
+    
+    .game-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .game-area {
+        width: min(90vw, 260px);
+    }
+    
+    .game-sidebar {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .next-block,
+    .game-controls {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    #nextPiece {
+        max-width: 120px;
+        max-height: 120px;
+    }
+    
+    .pad-row {
+        gap: 0.8rem;
+    }
+    
+    .pad-btn {
+        width: min(30vw, 60px);
+        height: min(22vw, 45px);
+    }
+    
+    .drop-btn {
+        width: min(60vw, 140px);
+    }
+}
+
+/* 横屏模式适配 */
+@media (orientation: landscape) and (max-height: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .game-container {
+        padding: 0.8rem;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    
+    .game-main {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+    
+    .game-area {
+        width: min(50vw, 250px);
+    }
+    
+    #tetris {
+        max-height: 70vh;
+    }
+    
+    .game-sidebar {
+        flex-direction: column;
+        min-width: 140px;
+        gap: 0.8rem;
+        padding: 0.5rem;
+    }
+    
+    .next-block {
+        min-width: auto;
+    }
+    
+    #nextPiece {
+        max-width: 100px;
+        max-height: 100px;
+    }
+    
+    .game-pad {
+        margin-top: 0.8rem;
+        gap: 0.8rem;
+    }
+    
+    .pad-btn {
+        width: min(15vw, 60px);
+        height: min(12vw, 45px);
+    }
+    
+    .drop-btn {
+        width: min(30vw, 120px);
+    }
+}
+
+/* 游戏结束和通关消息样式 */
+.game-over-text {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.game-win-text {
+    color: #4ade80;
+    font-weight: bold;
+}
+
+/* 视频创作者信息 */
+.creator-info {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+.creator-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+}
+
+/* 方块颜色 - 这些颜色在JavaScript中定义和使用 */
